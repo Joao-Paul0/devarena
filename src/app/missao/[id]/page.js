@@ -102,9 +102,9 @@ export default function Missao({ params }) {
 
       {/* Topbar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px', borderBottom: '1px solid #e5e7eb', background: '#fff' }}>
-        <span style={{ fontSize: '14px', fontWeight: '500' }}>dev<span style={{ color: '#534AB7' }}>arena</span></span>
+        <span style={{ fontSize: '14px', fontWeight: '500', color: '#111' }}>dev<span style={{ color: '#534AB7' }}>arena</span></span>
         <span style={{ fontSize: '11px', background: '#EEEDFE', color: '#3C3489', padding: '3px 10px', borderRadius: '20px', fontWeight: '500' }}>React #001</span>
-        <span style={{ fontSize: '13px', fontWeight: '500' }}>O filtro que não filtra</span>
+        <span style={{ fontSize: '13px', fontWeight: '500', color: '#111' }}>O filtro que não filtra</span>
       </div>
 
       {/* Layout */}
@@ -134,7 +134,7 @@ export default function Missao({ params }) {
                   <div style={{ fontSize: '11px', fontWeight: '500', color: '#534AB7', marginBottom: '6px' }}>Carla Mendes — Product Manager · #bugs-produto</div>
                   <div style={{ fontSize: '13px', color: '#26215C', lineHeight: '1.6' }}>Oi! Tô recebendo reclamações de usuários que o filtro de produtos não tá funcionando direito. Eles falam que selecionam uma categoria, os produtos aparecem certos, mas quando tentam trocar de categoria ou voltar pra &quot;Todas&quot;, os produtos somem ou aparecem errado. Consegue dar uma olhada? 🙏</div>
                 </div>
-                <div style={{ fontSize: '13px', color: '#444', lineHeight: '1.8' }}>
+                <div style={{ fontSize: '13px', color: '#e6dede', lineHeight: '1.8' }}>
                   <strong>O que entregar:</strong><br />
                   1. Reproduza o bug e descreva os passos exatos<br />
                   2. Identifique a causa raiz no código<br />
@@ -146,7 +146,7 @@ export default function Missao({ params }) {
             {aba === 'codigo' && (
               <div>
                 <div style={{ fontSize: '13px', color: '#666', marginBottom: '12px' }}>Clone o repositório e trabalhe localmente:</div>
-                <div style={{ fontFamily: 'monospace', fontSize: '12px', background: '#f3f4f6', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px' }}>
+                <div style={{ fontFamily: 'monospace', color: '#111', fontSize: '12px', background: '#f3f4f6', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px' }}>
                   git clone https://github.com/Joao-Paul0/shopflow-frontend.git<br />
                   cd shopflow-frontend<br />
                   npm install<br />
