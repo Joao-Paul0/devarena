@@ -9,7 +9,7 @@ export default function Login() {
     await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: 'http://localhost:3000/dashboard'
+        redirectTo: 'https://devarena-phi.vercel.app/dashboard'
       }
     })
   }
