@@ -139,7 +139,7 @@ export default function Missao({ params }) {
                     Carla Mendes — Product Manager · #bugs-produto
                   </div>
                   <div style={{ fontSize: '13px', color: '#c8c8e8', lineHeight: '1.7' }}>
-                    Oi! Tô recebendo reclamações de usuários que o filtro de produtos não tá funcionando direito. Eles falam que selecionam uma categoria, os produtos aparecem certos, mas quando tentam trocar de categoria ou voltar pra "Todas", os produtos somem ou aparecem errado. Consegue dar uma olhada? 🙏
+                    Oi! Tô recebendo reclamações de usuários que o filtro de produtos não tá funcionando direito. Eles falam que selecionam uma categoria, os produtos aparecem certos, mas quando tentam trocar de categoria ou voltar pra &quot;Todas&quot;, os produtos somem ou aparecem errado. Consegue dar uma olhada? 🙏
                   </div>
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '2' }}>
