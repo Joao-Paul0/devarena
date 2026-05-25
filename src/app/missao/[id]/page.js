@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '../../../lib/supabase'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
+
+const MonacoEditor = dynamic(
+  () => import('@monaco-editor/react'),
+  { ssr: false }
+)
 
 export default function Missao({ params }) {
   const [user, setUser] = useState(null)
@@ -152,18 +158,83 @@ export default function Missao({ params }) {
             )}
 
             {aba === 'codigo' && (
-              <div>
-                <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                  Clone o repositório e trabalhe localmente:
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '0' }}>
+
+                {/* Tabs de arquivo */}
+                <div style={{ display: 'flex', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+                  <div style={{ padding: '6px 16px', fontSize: '12px', color: 'var(--accent-light)', borderBottom: '1px solid var(--accent-light)', background: 'var(--bg-primary)' }}>
+                    ProductList.jsx
+                  </div>
+                  <div style={{ padding: '6px 16px', fontSize: '12px', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                    ProductCard.jsx
+                  </div>
+                  <div style={{ padding: '6px 16px', fontSize: '12px', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                    products.js
+                  </div>
                 </div>
-                <div style={{ fontFamily: 'monospace', fontSize: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', padding: '14px 16px', borderRadius: '8px', color: 'var(--green)', lineHeight: '1.9', marginBottom: '16px' }}>
-                  git clone https://github.com/Joao-Paul0/shopflow-frontend<br />
-                  cd shopflow-frontend<br />
-                  npm install<br />
-                  npm run dev
-                </div>
-                <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
-                  O bug está em algum lugar da lógica de filtro. Explore o código, reproduza o problema e encontre a causa raiz antes de corrigir.
+
+                {/* Editor */}
+                <div style={{ flex: 1, overflow: 'hidden' }}>
+                  <MonacoEditor
+                    height="100%"
+                    defaultLanguage="javascript"
+                    theme="vs-dark"
+                    defaultValue={`import { useState, useEffect } from 'react'
+import { fetchProducts } from '../api/products'
+import ProductCard from './ProductCard'
+
+export default function ProductList() {
+  const [products, setProducts] = useState([])
+  const [category, setCategory] = useState('')
+
+  useEffect(() => {
+    fetchProducts().then(data => setProducts(data))
+  }, [])
+
+  function handleFilter(cat) {
+    setCategory(cat)
+
+    if (cat === '') {
+      fetchProducts().then(data => setProducts(data))
+      return
+    }
+
+    for (let i = products.length - 1; i >= 0; i--) {
+      if (products[i].category !== cat) {
+        products.splice(i, 1)
+      }
+    }
+    setProducts([...products])
+  }
+
+  return (
+    <div className="p-4">
+      <select
+        onChange={e => handleFilter(e.target.value)}
+        className="mb-4 p-2 border rounded"
+      >
+        <option value="">Todas as categorias</option>
+        <option value="Eletrônicos">Eletrônicos</option>
+        <option value="Roupas">Roupas</option>
+        <option value="Casa">Casa</option>
+      </select>
+      <div className="grid grid-cols-3 gap-4">
+        {products.map(p => <ProductCard key={p.id} product={p} />)}
+      </div>
+    </div>
+  )
+}`}
+                    options={{
+                      fontSize: 13,
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                      lineNumbers: 'on',
+                      renderLineHighlight: 'line',
+                      tabSize: 2,
+                      wordWrap: 'on',
+                      padding: { top: 12 }
+                    }}
+                  />
                 </div>
               </div>
             )}
