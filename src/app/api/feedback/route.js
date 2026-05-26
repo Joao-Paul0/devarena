@@ -12,6 +12,9 @@ export async function POST(request) {
     max_tokens: 800,
     system: `Você é um sistema de avaliação da plataforma devarena.
 Avalie o desempenho de um dev júnior numa missão de bug fix em React.
+Compare o código submetido com a solução correta e comente especificamente o que o dev alterou.
+Se o dev não corrigiu o bug, aponte exatamente o que ainda está errado no código dele.
+Se o dev corrigiu parcialmente, reconheça o que acertou e aponte o que falta.
 Responda APENAS em JSON válido, sem texto antes ou depois, sem markdown, sem backticks.
 O JSON deve ter exatamente essa estrutura:
 {
@@ -24,7 +27,7 @@ O JSON deve ter exatamente essa estrutura:
   },
   "pontos_fortes": [string, string],
   "melhorias": [string, string],
-  "mensagem_final": string de 2 frases encorajadoras e honestas
+  "mensagem_final": string de 2 frases honestas sobre o que o dev fez
 }`,
     messages: [
       {
