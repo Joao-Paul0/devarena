@@ -29,6 +29,7 @@ export default function Missao({ params }) {
   const supabase = createClient()
   const router = useRouter()
   const [arquivoAtivo, setArquivoAtivo] = useState('ProductList.jsx')
+  const [codigoEditado, setCodigoEditado] = useState('')
 
   useEffect(() => {
     async function getUser() {
@@ -80,7 +81,8 @@ export default function Missao({ params }) {
           titulo: tituloPR,
           causaRaiz,
           comoTestar,
-          historicoCat: String(chat.length)
+          historicoCat: String(chat.length),
+          codigoEditado
         })
         router.push(`/feedback/1?${params.toString()}`)
       }, 3000)
@@ -256,6 +258,7 @@ export default function ProductList() {
                 {/* Editor */}
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <MonacoEditor
+                    onChange={(valor) => setCodigoEditado(valor || '')}
                     height="100%"
                     defaultLanguage="javascript"
                     theme="vs-dark"

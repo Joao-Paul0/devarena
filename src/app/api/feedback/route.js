@@ -5,7 +5,7 @@ const anthropic = new Anthropic({
 })
 
 export async function POST(request) {
-  const { titulo, causaRaiz, comoTestar, historicoCat } = await request.json()
+  const { titulo, causaRaiz, comoTestar, historicoCat, codigoEditado } = await request.json()
 
   const resposta = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
@@ -35,6 +35,8 @@ Título do PR: ${titulo}
 Causa raiz identificada: ${causaRaiz}
 Como testar descrito: ${comoTestar}
 Número de mensagens trocadas com a PM: ${historicoCat}
+Código submetido pelo dev:
+${codigoEditado || 'Dev não editou o código no editor.'}
 
 O bug correto era: mutação direta do array de produtos com splice() no handleFilter.
 A solução correta é usar filter() sem mutar o estado original.`
