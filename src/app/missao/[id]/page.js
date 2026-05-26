@@ -28,6 +28,7 @@ export default function Missao({ params }) {
   const [enviandoPR, setEnviandoPR] = useState(false)
   const supabase = createClient()
   const router = useRouter()
+  const [arquivoAtivo, setArquivoAtivo] = useState('ProductList.jsx')
 
   useEffect(() => {
     async function getUser() {
@@ -88,6 +89,78 @@ export default function Missao({ params }) {
     } finally {
       setEnviandoPR(false)
     }
+  }
+
+  const arquivos = {
+    'ProductList.jsx': `import { useState, useEffect } from 'react'
+import { fetchProducts } from '../api/products'
+import ProductCard from './ProductCard'
+
+export default function ProductList() {
+  const [products, setProducts] = useState([])
+  const [category, setCategory] = useState('')
+
+  useEffect(() => {
+    fetchProducts().then(data => setProducts(data))
+  }, [])
+
+  function handleFilter(cat) {
+    setCategory(cat)
+
+    if (cat === '') {
+      fetchProducts().then(data => setProducts(data))
+      return
+    }
+
+    for (let i = products.length - 1; i >= 0; i--) {
+      if (products[i].category !== cat) {
+        products.splice(i, 1)
+      }
+    }
+    setProducts([...products])
+  }
+
+  return (
+    <div className="p-4">
+      <select
+        onChange={e => handleFilter(e.target.value)}
+        className="mb-4 p-2 border rounded"
+      >
+        <option value="">Todas as categorias</option>
+        <option value="Eletrônicos">Eletrônicos</option>
+        <option value="Roupas">Roupas</option>
+        <option value="Casa">Casa</option>
+      </select>
+      <div className="grid grid-cols-3 gap-4">
+        {products.map(p => <ProductCard key={p.id} product={p} />)}
+      </div>
+    </div>
+  )
+}`,
+
+    'ProductCard.jsx': `export default function ProductCard({ product }) {
+  console.log('render ProductCard', product.id)
+
+  return (
+    <div className="border rounded-lg p-4 bg-white">
+      <h3 className="font-medium text-sm">{product.name}</h3>
+      <p className="text-xs text-gray-500 mt-1">{product.category}</p>
+      <p className="text-sm font-medium mt-2">
+        R$ {product.price.toLocaleString('pt-BR')}
+      </p>
+    </div>
+  )
+}`,
+
+    'products.js': `export const fetchProducts = () =>
+  Promise.resolve([
+    { id: 1, name: 'Notebook Pro', category: 'Eletrônicos', price: 3499 },
+    { id: 2, name: 'Fone Bluetooth', category: 'Eletrônicos', price: 299 },
+    { id: 3, name: 'Camiseta Dev', category: 'Roupas', price: 79 },
+    { id: 4, name: 'Moletom Clean', category: 'Roupas', price: 149 },
+    { id: 5, name: 'Caneca Code', category: 'Casa', price: 49 },
+    { id: 6, name: 'Mousepad XL', category: 'Casa', price: 89 },
+  ])`
   }
 
   if (!user) return (
@@ -162,15 +235,22 @@ export default function Missao({ params }) {
 
                 {/* Tabs de arquivo */}
                 <div style={{ display: 'flex', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
-                  <div style={{ padding: '6px 16px', fontSize: '12px', color: 'var(--accent-light)', borderBottom: '1px solid var(--accent-light)', background: 'var(--bg-primary)' }}>
-                    ProductList.jsx
-                  </div>
-                  <div style={{ padding: '6px 16px', fontSize: '12px', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                    ProductCard.jsx
-                  </div>
-                  <div style={{ padding: '6px 16px', fontSize: '12px', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                    products.js
-                  </div>
+                  {Object.keys(arquivos).map(arquivo => (
+                    <div
+                      key={arquivo}
+                      onClick={() => setArquivoAtivo(arquivo)}
+                      style={{
+                        padding: '6px 16px',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        color: arquivoAtivo === arquivo ? 'var(--accent-light)' : 'var(--text-muted)',
+                        borderBottom: arquivoAtivo === arquivo ? '1px solid var(--accent-light)' : '1px solid transparent',
+                        background: arquivoAtivo === arquivo ? 'var(--bg-primary)' : 'transparent'
+                      }}
+                    >
+                      {arquivo}
+                    </div>
+                  ))}
                 </div>
 
                 {/* Editor */}
@@ -179,51 +259,8 @@ export default function Missao({ params }) {
                     height="100%"
                     defaultLanguage="javascript"
                     theme="vs-dark"
-                    defaultValue={`import { useState, useEffect } from 'react'
-import { fetchProducts } from '../api/products'
-import ProductCard from './ProductCard'
-
-export default function ProductList() {
-  const [products, setProducts] = useState([])
-  const [category, setCategory] = useState('')
-
-  useEffect(() => {
-    fetchProducts().then(data => setProducts(data))
-  }, [])
-
-  function handleFilter(cat) {
-    setCategory(cat)
-
-    if (cat === '') {
-      fetchProducts().then(data => setProducts(data))
-      return
-    }
-
-    for (let i = products.length - 1; i >= 0; i--) {
-      if (products[i].category !== cat) {
-        products.splice(i, 1)
-      }
-    }
-    setProducts([...products])
-  }
-
-  return (
-    <div className="p-4">
-      <select
-        onChange={e => handleFilter(e.target.value)}
-        className="mb-4 p-2 border rounded"
-      >
-        <option value="">Todas as categorias</option>
-        <option value="Eletrônicos">Eletrônicos</option>
-        <option value="Roupas">Roupas</option>
-        <option value="Casa">Casa</option>
-      </select>
-      <div className="grid grid-cols-3 gap-4">
-        {products.map(p => <ProductCard key={p.id} product={p} />)}
-      </div>
-    </div>
-  )
-}`}
+                    value={arquivos[arquivoAtivo]}
+                    path={arquivoAtivo}
                     options={{
                       fontSize: 13,
                       minimap: { enabled: false },
