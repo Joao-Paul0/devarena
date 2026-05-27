@@ -6,6 +6,7 @@ const anthropic = new Anthropic({
 
 export async function POST(request) {
   const { titulo, causaRaiz, comoTestar, historicoCat, codigoEditado } = await request.json()
+  console.log('codigo recebido:', codigoEditado?.substring(0, 100))
 
   const resposta = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',

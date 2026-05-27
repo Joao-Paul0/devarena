@@ -11,31 +11,21 @@ export default function Feedback() {
   const router = useRouter()
 
   useEffect(() => {
-    const titulo = searchParams.get('titulo')
-    const causaRaiz = searchParams.get('causaRaiz')
-    const comoTestar = searchParams.get('comoTestar')
-    const historicoCat = searchParams.get('historicoCat')
-
-    if (!titulo || !causaRaiz || !comoTestar) {
-      router.push('/dashboard')
-      return
-    }
-
-    async function gerarFeedback() {
-      try {
-        const resposta = await fetch('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ titulo, causaRaiz, comoTestar, historicoCat })
-        })
-        const data = await resposta.json()
-        setFeedback(data)
-      } catch {
-        setErro(true)
+    try {
+      const saved = sessionStorage.getItem('feedback')
+      console.log('saved:', saved?.substring(0, 200))
+      if (!saved) {
+        console.log('sem dados, redirecionando')
+        router.push('/dashboard')
+        return
       }
+      const data = JSON.parse(saved)
+      console.log('data parseado:', data)
+      setFeedback(data)
+    } catch (err) {
+      console.log('erro:', err)
+      setErro(true)
     }
-
-    gerarFeedback()
   }, [])
 
   if (erro) return (

@@ -29,7 +29,7 @@ export default function Missao({ params }) {
   const supabase = createClient()
   const router = useRouter()
   const [arquivoAtivo, setArquivoAtivo] = useState('ProductList.jsx')
-  const [codigoEditado, setCodigoEditado] = useState('')
+  const [codigosEditados, setCodigosEditados] = useState({})
 
   useEffect(() => {
     async function getUser() {
@@ -63,6 +63,10 @@ export default function Missao({ params }) {
   }
 
   async function enviarPR() {
+    console.log('enviarPR chamado')
+    console.log('titulo:', tituloPR)
+    console.log('causaRaiz:', causaRaiz)
+    console.log('comoTestar:', comoTestar)
     if (!tituloPR.trim() || !causaRaiz.trim() || !comoTestar.trim()) {
       alert('Preencha todos os campos antes de enviar.')
       return
@@ -76,16 +80,26 @@ export default function Missao({ params }) {
       })
       const data = await resposta.json()
       setFeedbackLucas(data.resposta)
-      setTimeout(() => {
-        const params = new URLSearchParams({
-          titulo: tituloPR,
-          causaRaiz,
-          comoTestar,
-          historicoCat: String(chat.length),
-          codigoEditado
+
+      setTimeout(async () => {
+        console.log('codigo editado:', codigosEditados['ProductList.jsx']?.substring(0, 200))
+        console.log('arquivo atual:', arquivos['ProductList.jsx']?.substring(0, 200))
+        const feedbackResposta = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            titulo: tituloPR,
+            causaRaiz,
+            comoTestar,
+            historicoCat: String(chat.length),
+            codigoEditado: codigosEditados['ProductList.jsx'] || arquivos['ProductList.jsx']
+          })
         })
-        router.push(`/feedback/1?${params.toString()}`)
+        const feedbackData = await feedbackResposta.json()
+        sessionStorage.setItem('feedback', JSON.stringify(feedbackData))
+        router.push('/feedback/1')
       }, 3000)
+
     } catch {
       alert('Erro ao enviar PR. Tenta de novo.')
     } finally {
@@ -258,11 +272,14 @@ export default function ProductList() {
                 {/* Editor */}
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <MonacoEditor
-                    onChange={(valor) => setCodigoEditado(valor || '')}
+                    onChange={(valor) => setCodigosEditados(prev => ({
+                      ...prev,
+                      [arquivoAtivo]: valor || ''
+                    }))}
                     height="100%"
                     defaultLanguage="javascript"
                     theme="vs-dark"
-                    value={arquivos[arquivoAtivo]}
+                    value={codigosEditados[arquivoAtivo] ?? arquivos[arquivoAtivo]}
                     path={arquivoAtivo}
                     options={{
                       fontSize: 13,
@@ -309,7 +326,10 @@ export default function ProductList() {
                   />
                 </div>
                 <button
-                  onClick={enviarPR}
+                  onClick={() => {
+                    console.log('clicou')
+                    enviarPR()
+                  }}
                   disabled={enviandoPR}
                   style={{ background: enviandoPR ? 'var(--bg-hover)' : 'var(--accent)', color: '#fff', padding: '10px 16px', borderRadius: '8px', border: 'none', fontSize: '13px', fontWeight: '500', cursor: enviandoPR ? 'default' : 'pointer' }}
                 >
