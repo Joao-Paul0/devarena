@@ -22,6 +22,9 @@ export default function Feedback() {
       const data = JSON.parse(saved)
       console.log('data parseado:', data)
       setFeedback(data)
+      setTimeout(() => {
+        sessionStorage.removeItem('feedback')
+      }, 1000)
     } catch (err) {
       console.log('erro:', err)
       setErro(true)
