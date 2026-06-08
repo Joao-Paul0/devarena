@@ -30,6 +30,71 @@ export default function Missao({ params }) {
   const router = useRouter()
   const [arquivoAtivo, setArquivoAtivo] = useState('ProductList.jsx')
   const [codigosEditados, setCodigosEditados] = useState({})
+  const [previewCategoria, setPreviewCategoria] = useState('')
+  const [previewProdutos, setPreviewProdutos] = useState([
+    { id: 1, name: 'Notebook Pro', category: 'Eletrônicos', price: 3499 },
+    { id: 2, name: 'Fone Bluetooth', category: 'Eletrônicos', price: 299 },
+    { id: 3, name: 'Camiseta Dev', category: 'Roupas', price: 79 },
+    { id: 4, name: 'Moletom Clean', category: 'Roupas', price: 149 },
+    { id: 5, name: 'Caneca Code', category: 'Casa', price: 49 },
+    { id: 6, name: 'Mousepad XL', category: 'Casa', price: 89 },
+  ])
+
+  const todosProdutos = [
+    { id: 1, name: 'Notebook Pro', category: 'Eletrônicos', price: 3499 },
+    { id: 2, name: 'Fone Bluetooth', category: 'Eletrônicos', price: 299 },
+    { id: 3, name: 'Camiseta Dev', category: 'Roupas', price: 79 },
+    { id: 4, name: 'Moletom Clean', category: 'Roupas', price: 149 },
+    { id: 5, name: 'Caneca Code', category: 'Casa', price: 49 },
+    { id: 6, name: 'Mousepad XL', category: 'Casa', price: 89 },
+  ]
+
+  function executarPreview(cat) {
+    setPreviewCategoria(cat)
+
+    try {
+      const codigo = codigosEditados['ProductList.jsx'] || arquivos['ProductList.jsx']
+
+      // Extrai a lógica do handleFilter do código do dev
+      const matchFilter = codigo.match(/if \(cat === ''\)[^}]+}[\s\S]*?setProducts\([^)]+\)/g)
+
+      // Simula o comportamento baseado no código
+      if (cat === '') {
+        setPreviewProdutos([...todosProdutos])
+        return
+      }
+
+      // Detecta se o dev usou filter correto
+      const usouFilterCorreto = codigo.includes(`p.category === cat`) ||
+        codigo.includes(`p.category === cat)`)
+
+      // Detecta se ainda usa splice
+      const usouSplice = codigo.includes('splice')
+
+      // Detecta filter invertido
+      const usouFilterInvertido = codigo.includes(`p.category !== cat`)
+
+      if (usouSplice) {
+        // Simula o bug do splice — na segunda filtragem some
+        if (previewCategoria !== '' && cat !== previewCategoria) {
+          setPreviewProdutos([])
+        } else {
+          setPreviewProdutos(todosProdutos.filter(p => p.category === cat))
+        }
+      } else if (usouFilterInvertido) {
+        // Filter com lógica invertida — remove a categoria selecionada
+        setPreviewProdutos(todosProdutos.filter(p => p.category !== cat))
+      } else if (usouFilterCorreto) {
+        // Solução correta
+        setPreviewProdutos(todosProdutos.filter(p => p.category === cat))
+      } else {
+        // Código não reconhecido — mostra todos
+        setPreviewProdutos([...todosProdutos])
+      }
+    } catch {
+      setPreviewProdutos([...todosProdutos])
+    }
+  }
 
   useEffect(() => {
     async function getUser() {
@@ -205,7 +270,7 @@ export default function ProductList() {
 
           {/* Abas */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: 'var(--bg-secondary)', flexShrink: 0 }}>
-            {['briefing', 'codigo', 'pr'].map(a => (
+            {['briefing', 'codigo', 'preview', 'pr'].map(a => (
               <button key={a} onClick={() => setAba(a)} style={{
                 padding: '9px 18px',
                 fontSize: '13px',
@@ -295,7 +360,72 @@ export default function ProductList() {
                 </div>
               </div>
             )}
+            {aba === 'preview' && (
+              <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 
+                {/* Header do preview */}
+                <div style={{ padding: '10px 16px', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border)', fontSize: '12px', color: 'var(--text-muted)', flexShrink: 0 }}>
+                  ShopFlow — preview do seu código
+                </div>
+
+                {/* Simulação da loja */}
+                <div style={{ flex: 1, overflow: 'auto', padding: '20px', background: '#f9fafb' }}>
+
+                  {/* Header da loja */}
+                  <div style={{ background: '#fff', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #e5e7eb' }}>
+                    <span style={{ fontSize: '16px', fontWeight: '600', color: '#111' }}>ShopFlow</span>
+                  </div>
+
+                  {/* Filtro */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <select
+                      value={previewCategoria}
+                      onChange={e => executarPreview(e.target.value)}
+                      style={{ padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', background: '#fff', color: '#111', cursor: 'pointer' }}
+                    >
+                      <option value="">Todas as categorias</option>
+                      <option value="Eletrônicos">Eletrônicos</option>
+                      <option value="Roupas">Roupas</option>
+                      <option value="Casa">Casa</option>
+                    </select>
+                  </div>
+
+                  {/* Status */}
+                  <div style={{ marginBottom: '12px', fontSize: '12px', color: '#666' }}>
+                    {previewProdutos.length} produto(s) encontrado(s)
+                    {previewProdutos.length === 0 && (
+                      <span style={{ color: '#ef4444', fontWeight: '500', marginLeft: '8px' }}>
+                        ⚠ Bug detectado — lista vazia
+                      </span>
+                    )}
+                    {previewProdutos.length === todosProdutos.length && previewCategoria !== '' && (
+                      <span style={{ color: '#ef4444', fontWeight: '500', marginLeft: '8px' }}>
+                        ⚠ Bug detectado — filtro não está funcionando
+                      </span>
+                    )}
+                    {previewProdutos.length > 0 && previewProdutos.length < todosProdutos.length && previewCategoria !== '' && previewProdutos.every(p => p.category === previewCategoria) && (
+                      <span style={{ color: '#16a34a', fontWeight: '500', marginLeft: '8px' }}>
+                        ✓ Filtro funcionando corretamente
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Grid de produtos */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                    {previewProdutos.map(p => (
+                      <div key={p.id} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px' }}>
+                        <div style={{ fontSize: '13px', fontWeight: '500', color: '#111', marginBottom: '4px' }}>{p.name}</div>
+                        <div style={{ fontSize: '11px', color: '#666', marginBottom: '6px' }}>{p.category}</div>
+                        <div style={{ fontSize: '13px', fontWeight: '500', color: '#111' }}>
+                          R$ {p.price.toLocaleString('pt-BR')}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                </div>
+              </div>
+            )}
             {aba === 'pr' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
